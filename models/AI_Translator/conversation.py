@@ -35,32 +35,35 @@ class Chatbot:
         function_name = response.split(":")[0]
         
         if function_name in self.FUNCTION_MAP:
-            if function_name == "schedule_reminder":
-                try:
-                    _, company, time = response.split(":", 2)
-                    actual_response = schedule_reminder(company, time)
-                    self._reset_chat()
-                    return actual_response
-                except ValueError as e:
-                    self.messages.append({"role": "assistant", "content": f"Error processing the request: {e}"})
-            if function_name == "get_subscription_details":
-                try: 
-                    _, company = response.split(":", 1)
-                    actual_response = get_subscription_details(company)
-                    self._reset_chat()
-                    return actual_response
-                except ValueError as e:
-                    self.messages.append({"role": "assistant", "content": f"Error processing the request: {e}"})
-            else:
-                actual_response = self.FUNCTION_MAP[function_name]()
+            try:
+                # Use get_function_response to get the response and validate parameters
+                actual_response = self._get_function_response(function_name, response)
                 self._reset_chat()
                 return actual_response
-        elif self.back_and_forth >= 7:
+            except ValueError as e:
+                return f"Error processing the request: {e}. Please provide more information."
+
+        elif self.back_and_forth >= 7 or function_name in ["unrecognised", "irrelevant"]:
             self._reset_chat()
             return "Let's start over. Please state your request again."
-        else:
-            self.messages.append({"role": "assistant", "content": response})
+
         return response
+    
+    def _get_function_response(self, function_name, response):
+        if function_name == "schedule_reminder":
+            _, company, time = response.split(":", 2)
+            if not company or not time:
+                raise ValueError("Incomplete information. Please specify both the company and time.")
+            return schedule_reminder(company, time)
+
+        elif function_name == "get_subscription_details":
+            _, company = response.split(":", 1)
+            if not company:
+                raise ValueError("Incomplete information. Please specify the company.")
+            return get_subscription_details(company)
+
+        else:
+            return self.FUNCTION_MAP[function_name]()
     
     def _reset_chat(self):
         self.messages.clear()
@@ -73,14 +76,14 @@ if __name__ == "__main__":
     chatbot = Chatbot()
     
     # First interaction
-    query1 = "How much am i paying for amazon?"
+    query1 = "Can you schedule a reminder for a week from now"
     print(f"User:", query1)
     print(f"Chatbot:", chatbot.get_response(query1))
 
-    # # # Second interaction
-    # query2 = "amazon a week from now"
-    # print(f"User:", query2)
-    # print(f"Chatbot:", chatbot.get_response(query2))
+    # # Second interaction
+    query2 = "amazon"
+    print(f"User:", query2)
+    print(f"Chatbot:", chatbot.get_response(query2)) 
 
     # # # Third interaction
     # query3 = "yes"

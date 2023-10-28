@@ -64,16 +64,16 @@ if __name__ == "__main__":
     chatbot = Chatbot()
     
     # First interaction
-    query1 = "Can you please schedule a reminder to cancel amazon on the 17th November."
+    query1 = "can you set a reminder?"
     print(f"User:", query1)
     print(f"Chatbot:", chatbot.get_response(query1))
 
     # # Second interaction
-    # query2 = "Why did the chicken cross the road?"
-    # print(f"User:", query2)
-    # print(f"Chatbot:", chatbot.get_response(query2))
+    query2 = "amazon a week from now"
+    print(f"User:", query2)
+    print(f"Chatbot:", chatbot.get_response(query2))
 
-    # # Third interaction
-    # query3 = "Do you know any good songs?"
+    # # # Third interaction
+    # query3 = "yes"
     # print(f"User:", query3)
     # print(f"Chatbot:", chatbot.get_response(query3))

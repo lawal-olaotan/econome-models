@@ -13,6 +13,7 @@ For time-related tasks:
 - Convert relative terms into simple numeric operations. For instance, "tomorrow" is represented as "+1", "in two days" as "+2", and "two days before" as "-2".
 - A user query like "Set a reminder for Amazon tomorrow" should get the response "schedule_reminder:amazon:+1".
 - For reminders prior to an event, such as "two days before my Netflix payment", your answer should be "schedule_reminder:netflix:-2".
+- if the user provides an explicit date like "11th November" print it out as 11/11 (dd/mm)
 
 Incomplete Queries:
 - If a user's query lacks vital details, seek clarification. E.g., "Which service's price are you inquiring about?" or "For which subscription would you like a reminder?"

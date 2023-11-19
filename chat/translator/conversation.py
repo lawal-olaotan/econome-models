@@ -1,7 +1,10 @@
-import openai
+from openai import OpenAI
+from django.conf import settings
+
+client = OpenAI(api_key=settings.API_KEY)
 import os
-from functions import schedule_reminder, query_all_subscriptions, get_subscription_details
-from prompts import INIT_PROMPT
+from .functions import schedule_reminder, query_all_subscriptions, get_subscription_details
+from .prompts import INIT_PROMPT
 from datetime import datetime, timedelta
 
 class Chatbot:
@@ -15,8 +18,6 @@ class Chatbot:
     }
     
     def __init__(self):
-        
-        openai.api_key = self.API_KEY
         self.messages = [{"role": "system", "content": INIT_PROMPT.format(Chatbot.FUNCTIONS)}]
         self.back_and_forth = 0
     
@@ -24,12 +25,10 @@ class Chatbot:
         self.messages.append({"role": "user", "content": user_input})
         self.back_and_forth += 1
 
-        completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=self.messages
-        )
+        completion = client.chat.completions.create(model="gpt-3.5-turbo",
+        messages=self.messages)
 
-        response = completion.choices[0].message['content']
+        response = completion.choices[0].message.content
         self.back_and_forth += 1
 
         function_name = response.split(":")[0]
@@ -38,6 +37,7 @@ class Chatbot:
             try:
                 # Use get_function_response to get the response and validate parameters
                 actual_response = self._get_function_response(function_name, response)
+                print(actual_response)
                 self._reset_chat()
                 return actual_response
             except ValueError as e:
@@ -72,13 +72,13 @@ class Chatbot:
 
 
 # For testing
-if __name__ == "__main__":
-    chatbot = Chatbot()
+#if __name__ == "__main__":
+   # chatbot = Chatbot()
     
     # First interaction
-    query1 = "remind me to pay for amazon on the 34th November"
-    print(f"User:", query1)
-    print(f"Chatbot:", chatbot.get_response(query1))
+    #query1 = "remind me to pay for amazon on the 34th November"
+    #print(f"User:", query1)
+    #print(f"Chatbot:", chatbot.get_response(query1))
 
     # # # Second interaction
     # query2 = "amazon"

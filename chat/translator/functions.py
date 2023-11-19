@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import re
 
 def schedule_reminder(company, time):
     current_date = datetime.now()

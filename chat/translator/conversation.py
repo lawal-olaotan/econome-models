@@ -21,7 +21,7 @@ class Chatbot:
         self.messages = [{"role": "system", "content": INIT_PROMPT.format(Chatbot.FUNCTIONS)}]
         self.back_and_forth = 0
     
-    def get_response(self, user_input):
+    def get_response(self, user_input,userid):
         self.messages.append({"role": "user", "content": user_input})
         self.back_and_forth += 1
 
@@ -36,8 +36,7 @@ class Chatbot:
         if function_name in self.FUNCTION_MAP:
             try:
                 # Use get_function_response to get the response and validate parameters
-                actual_response = self._get_function_response(function_name, response)
-                print(actual_response)
+                actual_response = self._get_function_response(function_name, response,userid)
                 self._reset_chat()
                 return actual_response
             except ValueError as e:
@@ -49,21 +48,27 @@ class Chatbot:
 
         return response
     
-    def _get_function_response(self, function_name, response):
+    def _get_function_response(self, function_name, response,userid):
         if function_name == "schedule_reminder":
             _, company, time = response.split(":", 2)
             if not company or not time:
                 raise ValueError("Incomplete information. Please specify both the company and time.")
-            return schedule_reminder(company, time)
+            return schedule_reminder(company, time,userid)
 
         elif function_name == "get_subscription_details":
             _, company = response.split(":", 1)
             if not company:
                 raise ValueError("Incomplete information. Please specify the company.")
-            return get_subscription_details(company)
+            return get_subscription_details(company,userid)
+
+        elif function_name == "get_subscription_details":
+            _, company = response.split(":", 1)
+            if not company:
+                raise ValueError("Incomplete information. Please specify the company.")
+            return get_subscription_details(company,userid)
 
         else:
-            return self.FUNCTION_MAP[function_name]()
+            return self.FUNCTION_MAP[function_name](userid)
     
     def _reset_chat(self):
         self.messages.clear()

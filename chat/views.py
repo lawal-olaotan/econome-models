@@ -11,9 +11,11 @@ class ChatAppView(APIView):
 
     def get(self, request, *args, **kwargs ):
         chat = Chatbot()
-        chat_response = chat.get_response(request.query_params.get('message'))
+        postedBy = request.query_params.get('postedBy')
+        message = request.query_params.get('message')
+        chat_response = chat.get_response(message,postedBy)
         # take data from request and reterieve all data 
-        list= UserTrials.objects.filter( postedBy = request.query_params.get('postedBy'))
+        list= UserTrials.objects.filter( )
         serializer=UserTrialSerializer(list,many=True)
 
         return Response( chat_response , status=status.HTTP_200_OK)

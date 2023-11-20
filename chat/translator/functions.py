@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
+from ..models import UserTrials
+from ..serializers import UserTrialSerializer
 
-def schedule_reminder(company, time):
+def schedule_reminder(company, time, userid):
     current_date = datetime.now()
 
     # Check if time is a relative time
@@ -30,10 +32,17 @@ def schedule_reminder(company, time):
     return f"Reminder set for {formatted_date}"
 
 
-def query_all_subscriptions():
-	print("hello all")
-	return "you pay $4000 a month"
+def query_all_subscriptions(userid):
+    #retrieves all user subscription using the userId
+    list= UserTrials.objects.filter( postedBy = userid)
+    serializer= UserTrialSerializer(list,many=True)
+    return serializer.data
 
-def get_subscription_details(company):
-	print(company)
-	return "you pay $300 a month for Amazon Prime"
+def get_subscription_details(company,userid):
+    #filters userTrial object taking two conditions service name & userId
+    subscription= UserTrials.objects.filter( postedBy = userid, name=company.capitalize())
+    serializer= UserTrialSerializer(subscription,many=True)
+    #TODO: function currently returns Json, what happens if a user asks the question 
+    # when is my netflix subscription ending
+    # answer should be : your Netflix will be ending on 15 days from now 15th of September
+    return serializer.data
